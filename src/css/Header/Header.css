@@ -1,0 +1,152 @@
+/* Wrapper style for the custom marquee effect */
+.marquee {
+  /* background-color: #c701b0; Purple background */
+  /* color: #ef83e2; White text for contrast */
+  color: rgb(190, 255, 104);
+  padding: 10px 0; /* Vertical padding */
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  overflow: hidden; /* Hide overflowing content */
+  position: relative; /* Contain the moving content */
+  white-space: nowrap; /* Prevent wrapping */
+  display: flex; /* Use flexbox to align items horizontally */
+  width: 100%; /* Full width of the container */
+}
+
+/* Marquee animation for horizontal scrolling from right to left */
+@keyframes marquee {
+  0% {
+    transform: translateX(-100%); /* Start from right side (off-screen) */
+  }
+  100% {
+    transform: translateX(100%); /* Move to left side (off-screen) */
+  }
+}
+
+.animate-marquee {
+  animation: marquee 10s linear infinite; /* 10 seconds duration for a full scroll */
+}
+
+
+/* first end */
+
+
+  /* Container for the moving text */
+  .marquee-content {
+    display: flex;
+    flex-wrap: nowrap; /* No wrapping, so content stays in one row */
+    animation: custom-marquee 20s linear infinite; /* Marquee animation */
+  }
+  
+  /* Each set of text and images */
+  .marquee-item {
+    display: flex;
+    align-items: center;
+  }
+
+
+  
+  /* Style for each "New" tag gif */
+  .custom-new-tag {
+    width: 20px; /* Adjusted width of the GIF */
+    margin-right: 8px; /* Space between the gif and the text */
+  }
+  
+/* Wrapper style for the custom marquee effect */
+.custom-marquee {
+    background-color: #6a0dad; /* Purple background */
+    color: #fff; 
+    height: 30px;
+    padding: 5px 0; 
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    overflow: hidden;
+    position: relative; 
+    width: 100%; 
+    box-sizing: border-box; 
+  }
+  
+  /* Container for the moving text */
+  .marquee-content {
+    
+    display: flex;
+    flex-wrap: nowrap; /* No wrapping, so content stays in one row */
+    animation: custom-marquee 20s linear infinite; /* Marquee animation */
+  }
+  
+  /* Each set of text and images */
+  .marquee-item {
+    display: flex;
+    align-items: center;
+  }
+  
+
+  /* Bottom header Marquee */
+/* Wrapper style for the custom marquee effect */
+/* Wrapper style for the custom marquee effect */
+.custom-marquee {
+  background-color: #640d5f; /* Purple background */
+  color: #fff; /* White text for contrast */
+  padding: 5px 0; /* Reduced vertical padding to make it more compact */
+  font-family: Arial, sans-serif;
+  font-size: 14px; /* Smaller font size for more compact text */
+  overflow: hidden; /* Hide overflowing content */
+  position: relative; /* Contain the moving content */
+  width: 100%; /* Full width of the container */
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  white-space: nowrap; /* Prevent text from wrapping onto multiple lines */
+}
+
+/* Container for the moving text */
+.marquee-content {
+  display: flex;
+  flex-wrap: nowrap; /* No wrapping, so content stays in one row */
+  animation: custom-marquee 70s linear infinite; /* Marquee animation */
+  animation-play-state: running; /* Make sure it's running by default */
+}
+
+/* Each set of text and images */
+.marquee-item {
+  display: flex;
+  align-items: center;
+  margin-right: 30px; /* Space between each marquee item */
+}
+
+/* Space between the image and the text */
+.custom-new-tag {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px; /* Increased space between the GIF and text */
+}
+
+/* Link style */
+.marquee-link {
+  color: #fff; /* White text */
+  text-decoration: none; /* Remove underline */
+  font-size: 14px; /* Font size for compactness */
+  line-height: 18px; /* Adjust line height */
+}
+
+/* Hover effect for links: Pauses the animation */
+.marquee-link:hover {
+  color: #ffeb3b; /* Highlight on hover */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+/* Hovering over the marquee content itself */
+.custom-marquee:hover .marquee-content {
+  animation-play-state: paused; /* Pause the marquee animation on hover */
+}
+
+/* Define the animation */
+@keyframes custom-marquee {
+  0% {
+    transform: translateX(100%); /* Start from the right */
+  }
+  100% {
+    transform: translateX(-100%); /* Move to the left */
+  }
+}
+
+  
+  

@@ -1,0 +1,72 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  scroll-behavior: smooth !important;
+}
+
+
+/* li {
+  list-style-position: outside;
+}
+li.flex {
+  display: list-item;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* In your global CSS file (e.g., index.css) */
+.list-arrow {
+  list-style-type: none;
+  padding-left: 1rem;
+}
+
+.list-arrow li {
+  position: relative;
+}
+
+.list-arrow li::before {
+  content: "→"; /* Custom arrow or icon */
+  position: absolute;
+  left: -1.2rem; /* Adjust based on your needs */
+}
+
+@keyframes blinkColor {
+  0% {
+    color: #28a745; /* Green color */
+  }
+  50% {
+    color: #ffd700; /* Golden color */
+  }
+  100% {
+    color: #28a745; /* Green color */
+  }
+}
+
+@keyframes blinkText {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-blink {
+  animation: blinkColor 1s infinite, blinkText 1s infinite;
+} */
+
+#thin-cut {
+  text-decoration: line-through;
+  text-decoration-thickness: 0.35em; /* adjust thickness */
+  text-decoration-color: #ffffff; /* set the color of the cut (use background color) */
+  text-decoration-skip-ink: none;
+  background-color: red;
+}
