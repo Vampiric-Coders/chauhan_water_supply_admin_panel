@@ -25,13 +25,13 @@ export default function Sidebar({ open, setOpen }) {
     <>
 
       {/* ----------- MOBILE TOP NAV ---------- */}
-      {/* <div className="md:hidden mt-[1.6rem] ml-3">
+      <div className="md:hidden mt-[1.6rem] ml-3">
   
 
         <button onClick={() => setOpen(true)}>
           <FiMenu size={26} />
         </button>
-      </div> */}
+      </div>
 
 
       {/* ----------- DARK OVERLAY ---------- */}
