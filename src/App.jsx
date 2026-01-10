@@ -54,6 +54,8 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import AdminLayout from "./layout/AdminLayout";
 import Book from "./pages/User/Profile/Profile";
 import ManageOrders from "./pages/Admin/ManageOrders/ManageOrders";
+import Societies from "./pages/Admin/Societies/Societies";
+import Users from "./pages/Admin/Users/Users";
 
 export default function App() {
   const auth = localStorage.getItem("authToken");
@@ -70,8 +72,9 @@ export default function App() {
         {/* Admin routes with sidebar layout */}
         <Route element={<AdminLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/users" element={<Book />} />
+          <Route path="/users" element={<Users />} />
            <Route path="/orders" element={<ManageOrders />} />
+            <Route path="/societies" element={<Societies />} />
         </Route>
 
       </Routes>
