@@ -4,45 +4,37 @@ import { motion } from "framer-motion";
 import { DownloadIcon } from "lucide-react";
 
 export default function Navbar({ onMenuClick }) {
-
   const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [promptEvent, setPromptEvent] = useState(null);
- 
+
   // Listen for PWA install prompt
 
   useEffect(() => {
-
     const handler = (e) => {
-
       console.log("🔥 PWA install available");
 
       e.preventDefault();
 
       setPromptEvent(e);
-
     };
- 
+
     window.addEventListener("beforeinstallprompt", handler);
- 
+
     return () => window.removeEventListener("beforeinstallprompt", handler);
-
   }, []);
- 
-  const handleInstall = async () => {
 
+  const handleInstall = async () => {
     if (!promptEvent) return;
- 
+
     promptEvent.prompt();
 
     await promptEvent.userChoice;
 
     setPromptEvent(null);
-
   };
- 
 
   // close on outside click
   useEffect(() => {
@@ -57,44 +49,32 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <div className="w-full sticky top-0 z-50 bg-red/80 backdrop-blur-md border-b">
-
       <div className="px-4 py-3 flex items-center justify-between">
-
         {/* LEFT - menu + logo */}
         <div className="flex items-center gap-3">
-
           {/* Hamburger */}
-          {/* <button
+          <button
             onClick={onMenuClick}
             className="md:hidden p-2 rounded-xl border active:scale-95 transition hover:bg-gray-100"
           >
             <FiMenu size={22} />
-          </button> */}
+          </button>
 
           {/* Brand / logo */}
-          <p className="text-lg font-bold tracking-wide">
-            AquaPure
-          </p>
+          <p className="text-lg font-bold tracking-wide">AquaPure</p>
         </div>
 
         {/* RIGHT */}
         <div className="flex items-center gap-3">
-
           {/* Notification (hidden mobile) */}
           <button className="hidden md:flex p-2 rounded-xl border hover:bg-gray-100 active:scale-95 transition">
             <FiBell size={18} />
           </button>
 
-
-
-
-
- {promptEvent && (
-<button
-
-                  onClick={handleInstall}
-
-                  className="
+          {promptEvent && (
+            <button
+              onClick={handleInstall}
+              className="
 
                     flex items-center gap-2
 
@@ -119,10 +99,9 @@ export default function Navbar({ onMenuClick }) {
                     text-sm md:text-base
 
                   "
->
-<DownloadIcon
-
-                    className="
+            >
+              <DownloadIcon
+                className="
 
                       text-blue-300
 
@@ -133,34 +112,10 @@ export default function Navbar({ onMenuClick }) {
                       animate-bounce
 
                     "
-
-                  />
-
-                  Install
-</button>
-
-
- )}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+              />
+              Install
+            </button>
+          )}
 
           {/* PROFILE */}
           <div className="relative" ref={dropdownRef}>
@@ -196,7 +151,6 @@ export default function Navbar({ onMenuClick }) {
               </motion.div>
             )}
           </div>
-
         </div>
       </div>
     </div>

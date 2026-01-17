@@ -7,12 +7,11 @@ import {
   FiFileText,
   FiSettings,
   FiMenu,
-  FiX
+  FiX,
 } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar({ open, setOpen }) {
-
   const menu = [
     { name: "Dashboard", icon: <FiHome />, path: "/dashboard" },
     { name: "Users", icon: <FiUsers />, path: "/users" },
@@ -23,16 +22,14 @@ export default function Sidebar({ open, setOpen }) {
 
   return (
     <>
-
       {/* ----------- MOBILE TOP NAV ---------- */}
-      <div className="md:hidden mt-[1.6rem] ml-3">
+      {/* <div className="md:hidden mt-[1.6rem] ml-3">
   
 
         <button onClick={() => setOpen(true)}>
           <FiMenu size={26} />
         </button>
-      </div>
-
+      </div> */}
 
       {/* ----------- DARK OVERLAY ---------- */}
       {open && (
@@ -47,14 +44,13 @@ export default function Sidebar({ open, setOpen }) {
         <SidebarContent />
       </div>
 
-
       {/* ----------- MOBILE SIDEBAR ---------- */}
-    {/* ----------- MOBILE SIDEBAR ---------- */}
-<motion.div
-  initial={{ x: -260 }}
-  animate={{ x: open ? 0 : -260 }}
-  transition={{ duration: 0.25 }}
-  className="
+      {/* ----------- MOBILE SIDEBAR ---------- */}
+      <motion.div
+        initial={{ x: -260 }}
+        animate={{ x: open ? 0 : -260 }}
+        transition={{ duration: 0.25 }}
+        className="
     fixed 
     top-0 left-0 
     h-screen w-64 
@@ -65,25 +61,21 @@ export default function Sidebar({ open, setOpen }) {
     md:hidden
     overflow-y-auto
   "
->
-  <SidebarContent close={() => setOpen(false)} />
-</motion.div>
-
-
+      >
+        <SidebarContent close={() => setOpen(false)} />
+      </motion.div>
     </>
   );
 }
 
-
 function SidebarContent({ close }) {
-
   const menu = [
     { name: "Dashboard", icon: <FiHome />, path: "/dashboard" },
     { name: "Users", icon: <FiUsers />, path: "/users" },
     { name: "Societies", icon: <FiGrid />, path: "/societies" },
     { name: "Reports", icon: <FiFileText />, path: "/reports" },
     { name: "Settings", icon: <FiSettings />, path: "/settings" },
-        { name: "Manage Orders", icon: <FiSettings />, path: "/orders" },
+    { name: "Manage Orders", icon: <FiSettings />, path: "/orders" },
   ];
 
   return (
