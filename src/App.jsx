@@ -56,6 +56,9 @@ import Book from "./pages/User/Profile/Profile";
 import ManageOrders from "./pages/Admin/ManageOrders/ManageOrders";
 import Societies from "./pages/Admin/Societies/Societies";
 import Users from "./pages/Admin/Users/Users";
+import Reports from "./pages/Admin/Reports/Reports";
+import Subscription from "./pages/Admin/Subscription/Subscription";
+// import Subscription from "./pages/Admin/Subscription/Subscription";
 
 export default function App() {
   const auth = localStorage.getItem("authToken");
@@ -75,6 +78,8 @@ export default function App() {
           <Route path="/users" element={<Users />} />
            <Route path="/orders" element={<ManageOrders />} />
             <Route path="/societies" element={<Societies />} />
+              <Route path="/reports" element={<Reports/>} />
+                 <Route path="/subscriptions" element={<Subscription/>} />
         </Route>
 
       </Routes>

@@ -4,7 +4,9 @@ import { EditIcon, Trash2 } from "lucide-react";
 
 const Societies = () => {
   const [societies, setSocieties] = useState([]);
-  const [form, setForm] = useState({ id: null, name: "", address: "" });
+  const [form, setForm] = useState({ id: null, name: "",
+    //  address: ""
+     });
 
   /* ---------------- LOAD DATA ---------------- */
   useEffect(() => {
@@ -19,7 +21,10 @@ const Societies = () => {
   /* ---------------- CREATE / UPDATE ---------------- */
   const submitHandler = (e) => {
     e.preventDefault();
-    if (!form.name || !form.address) return;
+    if (!form.name 
+      // || 
+      // !form.address
+    ) return;
 
     let updated;
     if (form.id) {
@@ -32,7 +37,9 @@ const Societies = () => {
 
     setSocieties(updated);
     saveData(updated);
-    setForm({ id: null, name: "", address: "" });
+    setForm({ id: null, name: "",
+      //  address: ""
+       });
   };
 
   /* ---------------- ACTIONS ---------------- */
@@ -72,7 +79,7 @@ const Societies = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="text-sm font-medium text-gray-600">
-                Society Name
+                Society Name / Address
               </label>
               <input
                 type="text"
@@ -85,7 +92,7 @@ const Societies = () => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-gray-600">
                 Society Address
               </label>
@@ -98,7 +105,7 @@ const Societies = () => {
                 placeholder="Full address"
                 className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-            </div>
+            </div> */}
           </div>
 
           <motion.button
@@ -129,9 +136,9 @@ const Societies = () => {
                   <th className="px-6 py-4 font-medium text-left">
                     Society
                   </th>
-                  <th className="px-6 py-4 font-medium text-left">
+                  {/* <th className="px-6 py-4 font-medium text-left">
                     Address
-                  </th>
+                  </th> */}
                   <th className="px-6 py-4 font-medium text-right">
                     Actions
                   </th>
@@ -160,9 +167,9 @@ const Societies = () => {
                       </td>
 
                       {/* Address */}
-                      <td className="px-6 py-5 text-gray-500">
+                      {/* <td className="px-6 py-5 text-gray-500">
                         {soc.address}
-                      </td>
+                      </td> */}
 
                       {/* Actions */}
                       <td className="px-6 py-5 text-right">
