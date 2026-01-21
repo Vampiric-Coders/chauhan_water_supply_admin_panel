@@ -12,40 +12,36 @@
 
 //   return (
 //     <main>
-  
+
 //     <Router>
 
 // <AdminLayout/>
 //  <div className="ml-64 bg-gray-50 min-h-screen">
 
-
 //       <ScrollToTop />
 //         <Routes>
-        
-//           <Route 
-//             path="/" 
-//             element={auth ? <Dashboard /> : <AuthPage/>} 
+
+//           <Route
+//             path="/"
+//             element={auth ? <Dashboard /> : <AuthPage/>}
 //           />
-//            <Route 
-//             path="/dashboard" 
+//            <Route
+//             path="/dashboard"
 //             element={<Dashboard/>}
 //           />
 
-//            <Route 
-//             path="/users" 
+//            <Route
+//             path="/users"
 //             element={<Book/>}
 //           />
-
 
 //         </Routes>
 //         </div>
 //       </Router>
 
-
 //     </main>
 //   );
 // }
-
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
@@ -68,7 +64,6 @@ export default function App() {
       <ScrollToTop />
 
       <Routes>
-
         {/* Auth / Public */}
         <Route path="/" element={auth ? <Dashboard /> : <AuthPage />} />
 
@@ -76,12 +71,11 @@ export default function App() {
         <Route element={<AdminLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
-           <Route path="/orders" element={<ManageOrders />} />
-            <Route path="/societies" element={<Societies />} />
-              <Route path="/reports" element={<Reports/>} />
-                 <Route path="/subscriptions" element={<Subscription/>} />
+          <Route path="/orders" element={<ManageOrders />} />
+          <Route path="/societies" element={<Societies />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/subscription" element={<Subscription />} />
         </Route>
-
       </Routes>
     </Router>
   );
