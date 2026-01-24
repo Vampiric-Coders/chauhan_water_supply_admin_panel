@@ -54,6 +54,7 @@ import Societies from "./pages/Admin/Societies/Societies";
 import Users from "./pages/Admin/Users/Users";
 import Reports from "./pages/Admin/Reports/Reports";
 import Subscription from "./pages/Admin/Subscription/Subscription";
+import UserHistory from "./pages/Admin/UserHistory/UserHistory";
 // import Subscription from "./pages/Admin/Subscription/Subscription";
 
 export default function App() {
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/societies" element={<Societies />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/subscription" element={<Subscription />} />
+          <Route path="/UserHistory" element={<UserHistory />} />
         </Route>
       </Routes>
     </Router>
