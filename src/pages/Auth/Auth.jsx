@@ -11,6 +11,8 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
+import { loginApi, signupApi } from "../../apis/Auth/Auth";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -19,16 +21,18 @@ export default function AuthPage() {
 
   const [login, setLogin] = useState({ email: "", password: "" });
   const [signup, setSignup] = useState({
+    name: "",
     email: "",
+    phoneNumber: "",
     password: "",
     confirm: "",
   });
-  const [profile, setProfile] = useState({
-    name: "",
-    phone: "",
-    society: "",
-    flat: "",
-  });
+  // const [profile, setProfile] = useState({
+  //   society: "",
+  //   flat: "",
+  // });
+
+  const [error, setError] = useState(""); // For inline form errors
 
   const societies = [
     "Green Valley Apartments",
@@ -38,12 +42,39 @@ export default function AuthPage() {
 
   const fakeDelay = () => new Promise((r) => setTimeout(r, 800));
 
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   await fakeDelay();
+  //   navigate(login.email === "admin@aquapure.com" ? "/admin" : "/dashboard");
+  //   setLoading(false);
+  // };
+
   const handleLogin = async (e) => {
+    setError("");
+
     e.preventDefault();
     setLoading(true);
-    await fakeDelay();
-    navigate(login.email === "admin@aquapure.com" ? "/admin" : "/dashboard");
-    setLoading(false);
+
+    try {
+      const res = await loginApi(login.email, login.password);
+
+      // optional
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+      //  toast.success("Login successful 🚀");
+      //  setTimeout(() => {
+
+      navigate("/dashboard");
+      //  }, 3000);
+    } catch (err) {
+      console.log("toast aaya?");
+      // toast.error(err.response?.data?.message || "Login failed");
+      setError(err.response?.data?.message || "Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignup = (e) => {
@@ -56,11 +87,52 @@ export default function AuthPage() {
   };
 
   const handleOnboarding = async (e) => {
+    // e.preventDefault();
+    // setLoading(true);
+    // await fakeDelay();
+    // console.log('signup h?')
+    // // navigate("/dashboard");
+    // setLoading(false);
+
+    setError("");
+
     e.preventDefault();
     setLoading(true);
-    await fakeDelay();
-    navigate("/dashboard");
-    setLoading(false);
+
+    try {
+      const res = await signupApi(signup.name, signup.email,signup.phoneNumber,signup.password);
+      // console.log(first)
+
+      // optional
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
+
+        console.log('signup check--->')
+      }
+
+       toast.success("Signup successful 🚀");
+      setSignup({
+        name:'',
+        email:'',
+        phoneNumber:'',
+        password:'',
+        confirm:'',
+
+      })
+      //  setTimeout(() => {
+         console.log('login redirect hua se pehle--')
+        setStep("login");
+        console.log('login redirect hua se baad--')
+
+      // navigate("/dashboard");
+      //  }, 3000);
+    } catch (err) {
+      console.log("toast aaya?");
+      // toast.error(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -86,19 +158,29 @@ export default function AuthPage() {
                 icon={<Mail size={16} />}
                 placeholder="Email or Phone"
                 value={login.email}
-                onChange={(e) =>
-                  setLogin({ ...login, email: e.target.value })
-                }
+                // onChange={(e) =>
+                //   setLogin({ ...login, email: e.target.value })
+                // }
+                onChange={(e) => {
+                  setLogin({ ...login, email: e.target.value });
+                  setError(""); // clear inline error
+                }}
               />
               <Input
                 icon={<Lock size={16} />}
                 type="password"
                 placeholder="Password"
                 value={login.password}
-                onChange={(e) =>
-                  setLogin({ ...login, password: e.target.value })
-                }
+                // onChange={(e) =>
+                //   setLogin({ ...login, password: e.target.value })
+                // }
+
+                onChange={(e) => {
+                  setLogin({ ...login, password: e.target.value });
+                  setError(""); // clear inline error
+                }}
               />
+              {error && <p className="form-error">{error}</p>}
 
               <button className="primary" disabled={loading}>
                 {loading ? "Signing in..." : "Sign In"} <ArrowRight size={16} />
@@ -170,42 +252,17 @@ export default function AuthPage() {
               <Input
                 icon={<User size={16} />}
                 placeholder="Full Name"
-                value={profile.name}
+                value={signup.name}
                 onChange={(e) =>
-                  setProfile({ ...profile, name: e.target.value })
+                  setSignup({ ...signup, name: e.target.value })
                 }
               />
               <Input
                 icon={<Phone size={16} />}
                 placeholder="Phone Number"
-                value={profile.phone}
+                value={signup.phoneNumber}
                 onChange={(e) =>
-                  setProfile({ ...profile, phone: e.target.value })
-                }
-              />
-
-              <div className="input">
-                <Building2 size={16} />
-                <select
-                  value={profile.society}
-                  onChange={(e) =>
-                    setProfile({ ...profile, society: e.target.value })
-                  }
-                  required
-                >
-                  <option value="">Select Society</option>
-                  {societies.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              <Input
-                icon={<Home size={16} />}
-                placeholder="Flat Number (A-101)"
-                value={profile.flat}
-                onChange={(e) =>
-                  setProfile({ ...profile, flat: e.target.value })
+                  setSignup({ ...signup, phoneNumber: e.target.value })
                 }
               />
 
@@ -221,6 +278,10 @@ export default function AuthPage() {
                   {loading ? "Creating..." : "Get Started"}
                 </button>
               </div>
+               <p className="footer">
+                Already have an account?{" "}
+                <span onClick={() => setStep("login")}>Sign In</span>
+              </p>
             </form>
           </>
         )}
@@ -392,6 +453,9 @@ export default function AuthPage() {
           padding-top: 12px;
         }
       `}</style>
+      <div>
+        <Toaster/>
+      </div>
     </div>
   );
 }

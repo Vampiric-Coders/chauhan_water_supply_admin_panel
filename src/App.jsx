@@ -48,7 +48,7 @@ import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import AuthPage from "./pages/Auth/Auth";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import AdminLayout from "./layout/AdminLayout";
-import Book from "./pages/User/Profile/Profile";
+// import Book from "./pages/User/Profile/Profile";
 import ManageOrders from "./pages/Admin/ManageOrders/ManageOrders";
 import Societies from "./pages/Admin/Societies/Societies";
 import Users from "./pages/Admin/Users/Users";
