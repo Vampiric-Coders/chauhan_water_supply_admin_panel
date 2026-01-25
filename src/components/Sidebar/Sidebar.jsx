@@ -177,6 +177,7 @@ function SidebarContent({ close }) {
     { name: "Settings", icon: <FiSettings />, path: "/settings" },
     { name: "Manage Orders", icon: <FiSettings />, path: "/orders" },
     { name: "Manage Subscription", icon: <FiUsers />, path: "/subscription" }, // Added
+    { name: "User History", icon: <FiUsers />, path: "/UserHistory" },       // Added 
   ];
 
   return (
