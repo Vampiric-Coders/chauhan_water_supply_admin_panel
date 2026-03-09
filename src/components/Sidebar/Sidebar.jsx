@@ -174,10 +174,11 @@ function SidebarContent({ close }) {
     { name: "Users", icon: <FiUsers />, path: "/users" },
     { name: "Societies", icon: <FiGrid />, path: "/societies" },
     { name: "Reports", icon: <FiFileText />, path: "/reports" },
-    { name: "Settings", icon: <FiSettings />, path: "/settings" },
+    // { name: "Settings", icon: <FiSettings />, path: "/settings" },
     { name: "Manage Orders", icon: <FiSettings />, path: "/orders" },
     { name: "Manage Subscription", icon: <FiUsers />, path: "/subscription" }, // Added
     { name: "User History", icon: <FiUsers />, path: "/UserHistory" },       // Added 
+      { name: "Approval Requests", icon: <FiUsers />, path: "/admin/approval-requests" },       // Added 
   ];
 
   return (

@@ -10,6 +10,7 @@ import Users from "./pages/Admin/Users/Users";
 import Reports from "./pages/Admin/Reports/Reports";
 import Subscription from "./pages/Admin/Subscription/Subscription";
 import UserHistory from "./pages/Admin/UserHistory/UserHistory";
+import ApprovalRequests from "./pages/Admin/ApprovalRequests/ApprovalRequests";
 
 export default function App() {
   const auth = localStorage.getItem("authToken");
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/societies" element={<Societies />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/subscription" element={<Subscription />} />
+           <Route path="/admin/approval-requests" element={<ApprovalRequests />} />
 
           {/* 🔥 IMPORTANT ROUTES */}
           <Route path="/UserHistory" element={<UserHistory />} />

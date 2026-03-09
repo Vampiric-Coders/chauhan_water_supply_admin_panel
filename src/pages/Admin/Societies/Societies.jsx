@@ -104,6 +104,20 @@ const Societies = () => {
     });
   };
 
+
+  function convertTo12HourFormat(time24) {
+  if (!time24) return "";
+
+  const [hours, minutes] = time24.split(":");
+  let hour = parseInt(hours);
+  const ampm = hour >= 12 ? "PM" : "AM";
+
+  hour = hour % 12;
+  hour = hour ? hour : 12;
+
+  return `${hour}:${minutes} ${ampm}`;
+}
+
   return (
     <div className="min-h-screen bg-[#f8fafc] px-8 py-10">
       <Toaster position="top-right" reverseOrder={false} /> {/* Toast container */}
@@ -226,7 +240,9 @@ const Societies = () => {
                       </td>
                       <td className="px-6 py-5">{soc.societyAddress}</td>
                       <td className="px-6 py-5">
-                        {soc.societyEstimatedDeliveryTimeFrom} - {soc.societyEstimatedDeliveryTimeTo}
+                        {/* {soc.societyEstimatedDeliveryTimeFrom} - {soc.societyEstimatedDeliveryTimeTo} */}
+                         {convertTo12HourFormat(soc.societyEstimatedDeliveryTimeFrom)} - 
+    {convertTo12HourFormat(soc.societyEstimatedDeliveryTimeTo)}
                       </td>
                       <td className="px-6 py-5 text-right">
                         <div className="flex justify-end gap-6">

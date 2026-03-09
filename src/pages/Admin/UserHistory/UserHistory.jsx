@@ -1,75 +1,80 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { FiSearch, FiDownload, FiArrowLeft, FiCalendar } from "react-icons/fi";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { getAllUserHistory } from "../../../apis/UserHistory/UserHistory";
 
 /* ================= DUMMY DATA ================= */
-const SOCIETIES = [
-  {
-    name: "Sunrise Heights",
-    users: [
-      {
-        id: "U-101",
-        name: "Aman Gupta",
-        phone: "9876500011",
-        flat: "A-203",
-        type: "Daily",
-        history: [
-          {
-            orderId: "ORD-1001",
-            date: "2026-01-05",
-            time: "07:30 AM",
-            cans: 2,
-            amount: 240,
-          },
-          {
-            orderId: "ORD-1002",
-            date: "2026-01-04",
-            time: "08:10 AM",
-            cans: 1,
-            amount: 120,
-          },
-        ],
-      },
-      {
-        id: "U-102",
-        name: "Ritu Sharma",
-        phone: "9876500022",
-        flat: "B-110",
-        type: "Subscription",
-        history: [
-          {
-            orderId: "ORD-1003",
-            date: "2026-01-05",
-            time: "06:30 AM",
-            cans: 1,
-            amount: 90,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    name: "Green Valley",
-    users: [
-      {
-        id: "U-103",
-        name: "Karan Mehta",
-        phone: "9876500012",
-        flat: "C-404",
-        type: "Daily",
-        history: [
-          {
-            orderId: "ORD-1004",
-            date: "2026-01-03",
-            time: "09:15 AM",
-            cans: 2,
-            amount: 240,
-          },
-        ],
-      },
-    ],
-  },
-];
+// const SOCIETIES = [
+//   {
+//     name: "Sunrise Heights",
+//     users: [
+//       {
+//         id: "U-101",
+//         name: "Aman Gupta",
+//         phone: "9876500011",
+//         flat: "A-203",
+//         type: "Daily",
+//         history: [
+//           {
+//             orderId: "ORD-1001",
+//             date: "2026-01-05",
+//             time: "07:30 AM",
+//             cans: 2,
+//             amount: 240,
+//           },
+//           {
+//             orderId: "ORD-1002",
+//             date: "2026-01-04",
+//             time: "08:10 AM",
+//             cans: 1,
+//             amount: 120,
+//           },
+//         ],
+//       },
+//       {
+//         id: "U-102",
+//         name: "Ritu Sharma",
+//         phone: "9876500022",
+//         flat: "B-110",
+//         type: "Subscription",
+//         history: [
+//           {
+//             orderId: "ORD-1003",
+//             date: "2026-01-05",
+//             time: "06:30 AM",
+//             cans: 1,
+//             amount: 90,
+//           },
+//         ],
+//       },
+//     ],
+//   },
+//   {
+//     name: "Green Valley",
+//     users: [
+//       {
+//         id: "U-103",
+//         name: "Karan Mehta",
+//         phone: "9876500012",
+//         flat: "C-404",
+//         type: "Daily",
+//         history: [
+//           {
+//             orderId: "ORD-1004",
+//             date: "2026-01-03",
+//             time: "09:15 AM",
+//             cans: 2,
+//             amount: 240,
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// ];
+
+
+
+
 
 export default function UserHistory() {
   const { userId } = useParams();
@@ -83,10 +88,41 @@ export default function UserHistory() {
   const [date, setDate] = useState("");
   const [month, setMonth] = useState("");
 
+ const [societies, setSocieties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllUserHistory();
+        setSocieties(data);
+        console.log('data-->',data)
+      } catch (err) {
+        console.error("API Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
   /* ===== AUTO SELECT USER (REPORT FLOW) ===== */
   useEffect(() => {
     if (!userId) return;
-    for (const s of SOCIETIES) {
+    for (const s of societies) {
       const u = s.users.find((x) => x.id === userId);
       if (u) {
         setSelectedSociety(s);
@@ -126,12 +162,37 @@ export default function UserHistory() {
   }, [selectedUser, date, month]);
 
   /* ===== SUMMARY ===== */
+  // const summary = useMemo(() => {
+  //   const totalOrders = filteredHistory.length;
+  //   const totalCans = filteredHistory.reduce((s, h) => s + h.cans, 0);
+  //   const totalAmount = filteredHistory.reduce((s, h) => s + h.amount, 0);
+  //   return { totalOrders, totalCans, totalAmount };
+  // }, [filteredHistory]);
+
+
   const summary = useMemo(() => {
-    const totalOrders = filteredHistory.length;
-    const totalCans = filteredHistory.reduce((s, h) => s + h.cans, 0);
-    const totalAmount = filteredHistory.reduce((s, h) => s + h.amount, 0);
-    return { totalOrders, totalCans, totalAmount };
-  }, [filteredHistory]);
+  let totalOrders = 0;
+  let totalCans = 0;
+  let totalAmount = 0;
+
+  filteredHistory.forEach((h) => {
+    totalOrders += 1;
+    console.log('h.type-->',h)
+
+    if (h.type === "subscription") {
+      // 🔹 subscription → fixed cans (already per day)
+      totalCans = h.cans;
+      // totalAmount += h.amount;
+    } else {
+      // 🔹 daily user → sirf aaj ki cans
+      totalCans += h.cans;
+      // totalAmount += h.amount;
+    }
+  });
+
+  return { totalOrders, totalCans, totalAmount };
+}, [filteredHistory]);
+
 
   /* ===== CSV ===== */
   const downloadCSV = () => {
@@ -173,7 +234,7 @@ export default function UserHistory() {
       {/* SOCIETIES */}
       {!selectedSociety && (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {SOCIETIES.map((s) => (
+          {societies.map((s) => (
             <div
               key={s.name}
               onClick={() => setSelectedSociety(s)}
@@ -199,38 +260,44 @@ export default function UserHistory() {
             />
           </div>
 
-          {filteredUsers.map((u) => (
-            <div
-              key={u.id}
-              onClick={() => setSelectedUser(u)}
-              className="bg-white rounded-2xl p-4 shadow hover:shadow-lg cursor-pointer border-l-4 border-blue-500"
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-slate-800">{u.name}</p>
-                  <p className="text-sm text-slate-500">
-                    📞{" "}
-                    <a
-                      href={`tel:${u.phone}`}
-                      className="underline hover:text-blue-600"
-                    >
-                      {u.phone}
-                    </a>{" "}
-                    • 🏠 {u.flat}
-                  </p>
-                </div>
-                <span
-                  className={`text-xs px-3 py-1 rounded-full font-semibold ${
-                    u.type === "Subscription"
-                      ? "bg-purple-100 text-purple-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
-                >
-                  {u.type}
-                </span>
-              </div>
-            </div>
-          ))}
+        {filteredUsers.map((u) => {
+  const userType =
+    u.history.length > 0 ? u.history[0].type : "No Orders";
+
+  return (
+    <div
+      key={u.id}
+      onClick={() => setSelectedUser(u)}
+      className="bg-white rounded-2xl p-4 shadow hover:shadow-lg cursor-pointer border-l-4 border-blue-500"
+    >
+      <div className="flex justify-between items-center">
+        <div>
+          <p className="font-bold text-slate-800">{u.name}</p>
+          <p className="text-sm text-slate-500">
+            📞{" "}
+            <a href={`tel:${u.phone}`} className="underline">
+              {u.phone}
+            </a>{" "}
+            • 🏠 {u.flat}
+          </p>
+        </div>
+
+        <span
+          className={`text-xs px-3 py-1 rounded-full font-semibold ${
+            userType === "subscription"
+              ? "bg-purple-100 text-purple-700"
+              : userType === "daily"
+              ? "bg-green-100 text-green-700"
+              : "bg-slate-200 text-slate-600"
+          }`}
+        >
+          {userType}
+        </span>
+      </div>
+    </div>
+  );
+})}
+
         </>
       )}
 

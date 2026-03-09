@@ -1,81 +1,123 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { FiDownload, FiCalendar } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-/* ================= DUMMY MASTER DATA ================= */
-const USERS = [
-  {
-    id: "U-101",
-    name: "Aman Gupta",
-    phone: "9876500011",
-    society: "Sunrise Heights",
-    type: "Daily",
-    history: [
-      { date: "2026-01-10", cans: 2, amount: 240 },
-      { date: "2026-01-08", cans: 3, amount: 360 },
-      { date: "2025-12-20", cans: 1, amount: 120 },
-    ],
-  },
-  {
-    id: "U-102",
-    name: "Pooja Jain",
-    phone: "9876500020",
-    society: "Palm Residency",
-    type: "Subscription",
-    history: [
-      { date: "2026-01-05", cans: 30, amount: 2700 },
-      { date: "2025-12-05", cans: 30, amount: 2700 },
-      { date: "2025-11-05", cans: 30, amount: 2700 },
-    ],
-  },
-];
-
-const SOCIETIES = ["All", ...new Set(USERS.map((u) => u.society))];
-
-/* ================= COMPONENT ================= */
 export default function ReportsDashboard() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [userType, setUserType] = useState("All");
   const [society, setSociety] = useState("All");
   const [date, setDate] = useState("");
   const [month, setMonth] = useState("");
+
   const navigate = useNavigate();
 
-  /* ================= FLATTEN REPORT DATA ================= */
+  /* ================= FETCH ORDERS FROM BACKEND ================= */
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        "http://localhost:8080/api/orders/all-orders",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ send token
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch orders");
+      }
+
+      setOrders(data.orders || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchOrders();
+}, []);
+
+  /* ================= GET UNIQUE SOCIETIES ================= */
+  const SOCIETIES = useMemo(() => {
+    const unique = [
+      ...new Set(orders.map((o) => o.user?.societyName).filter(Boolean)),
+    ];
+    return ["All", ...unique];
+  }, [orders]);
+
+  /* ================= FORMAT & FILTER REPORT DATA ================= */
   const reportRows = useMemo(() => {
     let rows = [];
 
-    USERS.forEach((u) => {
-      if (userType !== "All" && u.type !== userType) return;
-      if (society !== "All" && u.society !== society) return;
+    orders.forEach((order) => {
+      const formattedDate = new Date(order.date)
+        .toISOString()
+        .split("T")[0];
 
-      u.history.forEach((h) => {
-        if (date && h.date !== date) return;
-        if (month && !h.date.startsWith(month)) return;
+      const formattedMonth = formattedDate.slice(0, 7);
 
-        rows.push({
-          UserID: u.id,
-          Name: u.name,
-          Phone: u.phone,
-          Society: u.society,
-          Type: u.type,
-          Date: h.date,
-          Cans: h.cans,
-          Amount: h.amount,
-        });
+      if (
+        userType !== "All" &&
+        order.orderType.toLowerCase() !== userType.toLowerCase()
+      )
+        return;
+
+      if (
+        society !== "All" &&
+        order.user?.societyName !== society
+      )
+        return;
+
+      if (date && formattedDate !== date) return;
+
+      if (month && formattedMonth !== month) return;
+
+      rows.push({
+        UserID: order.user?._id,
+        Name: order.user?.name,
+        Phone: order.user?.phoneNumber,
+        Society: order.user?.societyName,
+        Flat: order.user?.addressFlatNo,
+        Type:
+          order.orderType.charAt(0).toUpperCase() +
+          order.orderType.slice(1),
+        Status: order.orderStatus,
+        Payment: order.orderPayment,
+        Date: formattedDate,
+        Cans: order.cansPerDay,
+        Amount: Number(order.totalAmount),
       });
     });
 
     return rows.sort((a, b) => (a.Date < b.Date ? 1 : -1));
-  }, [userType, society, date, month]);
+  }, [orders, userType, society, date, month]);
 
   /* ================= CSV EXPORT ================= */
   const downloadCSV = () => {
     if (!reportRows.length) return;
 
     const headers = Object.keys(reportRows[0]).join(",");
-    const rows = reportRows.map((r) => Object.values(r).join(",")).join("\n");
+    const rows = reportRows
+      .map((r) => Object.values(r).join(","))
+      .join("\n");
 
-    const blob = new Blob([headers + "\n" + rows], { type: "text/csv" });
+    const blob = new Blob([headers + "\n" + rows], {
+      type: "text/csv",
+    });
+
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -104,9 +146,9 @@ export default function ReportsDashboard() {
           onChange={(e) => setUserType(e.target.value)}
           className="border rounded-xl px-3 py-2"
         >
-          <option value="All">All Users</option>
-          <option value="Daily">Daily Orders</option>
-          <option value="Subscription">Subscription</option>
+          <option value="All">All Orders</option>
+          <option value="daily">Daily</option>
+          <option value="subscription">Subscription</option>
         </select>
 
         <select
@@ -152,7 +194,7 @@ export default function ReportsDashboard() {
         </button>
       </div>
 
-      {/* REPORT TABLE */}
+      {/* TABLE */}
       <div className="bg-white rounded-2xl shadow border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-600">
@@ -166,33 +208,55 @@ export default function ReportsDashboard() {
             </tr>
           </thead>
           <tbody>
-            {reportRows.map((r, i) => (
-              <tr key={i} className="border-t hover:bg-slate-50">
-                {/* 🔥 IMPORTANT CHANGE HERE */}
-                <td
-                  onClick={() =>
-                    navigate(`/admin/user/${r.UserID}`, {
-                      state: { from: "reports" },
-                    })
-                  }
-                  className="px-3 py-2 font-semibold text-blue-600 cursor-pointer hover:underline"
-                >
-                  {r.UserID}
-                </td>
-
-                <td className="px-3 py-2">{r.Name}</td>
-                <td className="px-3 py-2">{r.Phone}</td>
-                <td className="px-3 py-2">{r.Society}</td>
-                <td className="px-3 py-2">{r.Type}</td>
-                <td className="px-3 py-2">{r.Date}</td>
-                <td className="px-3 py-2">{r.Cans}</td>
-                <td className="px-3 py-2 font-semibold">₹{r.Amount}</td>
-              </tr>
-            ))}
-
-            {!reportRows.length && (
+            {loading && (
               <tr>
-                <td colSpan={10} className="text-center py-6 text-slate-400">
+                <td colSpan={12} className="text-center py-6">
+                  Loading orders...
+                </td>
+              </tr>
+            )}
+
+            {error && (
+              <tr>
+                <td colSpan={12} className="text-center py-6 text-red-500">
+                  {error}
+                </td>
+              </tr>
+            )}
+
+            {!loading &&
+              !error &&
+              reportRows.map((r, i) => (
+                <tr key={i} className="border-t hover:bg-slate-50">
+                  <td
+                    onClick={() =>
+                      navigate(`/admin/user/${r.UserID}`, {
+                        state: { from: "reports" },
+                      })
+                    }
+                    className="px-3 py-2 font-semibold text-blue-600 cursor-pointer hover:underline"
+                  >
+                    {r.UserID}
+                  </td>
+
+                  <td className="px-3 py-2">{r.Name}</td>
+                  <td className="px-3 py-2">{r.Phone}</td>
+                  <td className="px-3 py-2">{r.Society}</td>
+                  <td className="px-3 py-2">{r.Flat}</td>
+                  <td className="px-3 py-2">{r.Type}</td>
+                  <td className="px-3 py-2">{r.Status}</td>
+                  <td className="px-3 py-2">{r.Payment}</td>
+                  <td className="px-3 py-2">{r.Date}</td>
+                  <td className="px-3 py-2">{r.Cans}</td>
+                  <td className="px-3 py-2 font-semibold">
+                    ₹{r.Amount}
+                  </td>
+                </tr>
+              ))}
+
+            {!loading && !error && !reportRows.length && (
+              <tr>
+                <td colSpan={12} className="text-center py-6 text-slate-400">
                   No data for selected filters
                 </td>
               </tr>

@@ -5,7 +5,8 @@ import axios from "axios";
 ===================== */
 export const loginApi = (email, password) => {
   return axios.post(
-    "http://localhost:8080/api/admin/login",
+    // "http://localhost:8080/api/admin/login",
+    `${import.meta.env.VITE_API_URL}/admin/login`,
     {
       email,
       password,
@@ -18,7 +19,8 @@ export const loginApi = (email, password) => {
 ===================== */
 export const signupApi = (name,email, password,phoneNumber) => {
   return axios.post(
-    "http://localhost:8080/api/admin/signup",
+    // "http://localhost:8080/api/admin/signup",
+        `${import.meta.env.VITE_API_URL}/admin/signup`,
     {
       name,
       email,
