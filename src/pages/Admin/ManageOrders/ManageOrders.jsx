@@ -9,7 +9,7 @@ export default function ManageDeliveries() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [society, setSociety] = useState("All");
-
+const [dateFilter, setDateFilter] = useState(""); // new
 const today = new Date().toISOString().split("T")[0];
 /* ================= FETCH DATA ================= */
  useEffect(() => {
@@ -19,8 +19,9 @@ const today = new Date().toISOString().split("T")[0];
       const orders = res?.data?.orders || [];
 
 // const formatted = orders.map((o) => {
-//   // console.log("order object:", o);
-//   // console.log("order type:", o.orderType); // ya o.orderType (agar wahi field hai)
+//   const formattedDate = new Date(o.date)
+//     .toISOString()
+//     .split("T")[0]; // YYYY-MM-DD format
 
 //   return {
 //     id: o._id,
@@ -31,14 +32,20 @@ const today = new Date().toISOString().split("T")[0];
 //     phone: o.user?.phoneNumber || "N/A",
 //     society: o.user?.societyName || "N/A",
 //     flat: o.user?.addressFlatNo || "N/A",
-//     cans: o?.cansPerDay
+//     cans: o?.cansPerDay,
+//     date: formattedDate,   // ✅ add this
 //   };
 // });
 
+
 const formatted = orders.map((o) => {
-  const formattedDate = new Date(o.date)
-    .toISOString()
-    .split("T")[0]; // YYYY-MM-DD format
+  const orderDate = new Date(o.date);
+
+  // Local date in yyyy-MM-dd (matches input type="date")
+  const year = orderDate.getFullYear();
+  const month = String(orderDate.getMonth() + 1).padStart(2, "0");
+  const day = String(orderDate.getDate()).padStart(2, "0");
+  const localDateString = `${year}-${month}-${day}`;
 
   return {
     id: o._id,
@@ -50,10 +57,9 @@ const formatted = orders.map((o) => {
     society: o.user?.societyName || "N/A",
     flat: o.user?.addressFlatNo || "N/A",
     cans: o?.cansPerDay,
-    date: formattedDate,   // ✅ add this
+    date: localDateString, // ✅ correct local date
   };
 });
-
 
       setData(formatted);
     } catch (err) {
@@ -73,16 +79,6 @@ const formatted = orders.map((o) => {
     [data],
   );
 
-  /* BASE FILTER (TAB + SOCIETY) */
-  // const baseFiltered = useMemo(() => {
-  //   return data.filter((o) => {
-  //     // console.log('o m kya aara h-->',o)
-  //     if (tab === "Orders" && o.type !== "daily") return false;
-  //     if (tab === "Subscriptions" && o.type !== "subscription") return false;
-  //     if (society !== "All" && o.society !== society) return false;
-  //     return true;
-  //   });
-  // }, [tab, society, data]);
 
   const baseFiltered = useMemo(() => {
   return data.filter((o) => {
@@ -103,28 +99,20 @@ const formatted = orders.map((o) => {
   });
 }, [tab, society, data, today]);
 
-  /* SUMMARY (SOCIETY + TAB BASED) */
-//   const summary = useMemo(() => {
- 
 
 
-//     if (tab === "Orders") {
-//   return {
-//     total: baseFiltered.length,
-//     pending: baseFiltered.filter((o) => {
-//       console.log("o order -->", o); // ✅ yahan milega
+const filteredData = data.filter((o) => {
+  const matchesSearch =
+    o.name.toLowerCase().includes(search.toLowerCase()) ||
+    o.phone.includes(search) ||
+    o.id.includes(search);
 
-//       return o.orderStatus === "Pending";
-//     }).length,
-//   };
-// }
+  const matchesSociety = society ? o.society === society : true;
 
-//     return {
-//       total: baseFiltered.length,
-//       pending: baseFiltered.filter((o) => !o.orderStatus).length,
-//       unpaid: baseFiltered.filter((o) => !o.orderPayment).length,
-//     };
-//   }, [baseFiltered, tab]);
+  const matchesDate = dateFilter ? o.date.startsWith(dateFilter) : true;
+
+  return matchesSearch && matchesSociety && matchesDate;
+});
 
 
 const normalizeStatus = (status) =>
@@ -176,18 +164,20 @@ const summary = useMemo(() => {
 }, [baseFiltered, tab]);
 
   /* LIST FILTER (SEARCH + BASE FILTER) */
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return baseFiltered.filter(
-      (o) =>
-        !q ||
-        o.name.toLowerCase().includes(q) ||
-        o.phone.includes(q) ||
-        o.id.toLowerCase().includes(q),
-    );
-  }, [search, baseFiltered]);
+const filtered = useMemo(() => {
+  const q = search.toLowerCase();
+  return baseFiltered.filter((o) => {
+    const matchesSearch =
+      !q ||
+      o.name.toLowerCase().includes(q) ||
+      o.phone.includes(q) ||
+      o.id.toLowerCase().includes(q);
 
+    const matchesDate = dateFilter ? o.date === dateFilter : true; // ✅ date filter
 
+    return matchesSearch && matchesDate;
+  });
+}, [search, baseFiltered, dateFilter]);
 
 const update = async (id, key, value) => {
   // optimistic UI update
@@ -289,7 +279,7 @@ const update = async (id, key, value) => {
       </div>
 
       {/* SEARCH + SOCIETY FILTER */}
-      <div className="flex gap-3 mb-3">
+      {/* <div className="flex gap-3 mb-3">
         <div className="flex-1">
           <Input
             icon={<FiSearch />}
@@ -308,11 +298,45 @@ const update = async (id, key, value) => {
             <option key={s}>{s}</option>
           ))}
         </select>
-      </div>
+      </div> */}
 
+
+<div className="flex gap-3 mb-3">
+  {/* Search Input */}
+  <div className="flex-1">
+    <Input
+      icon={<FiSearch />}
+      placeholder="Search name / phone / id"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+  </div>
+
+  {/* Society Dropdown */}
+  <select
+    className="p-3 rounded-xl border bg-white shadow"
+    value={society}
+    onChange={(e) => setSociety(e.target.value)}
+  >
+    <option value="">All Societies</option>
+    {societies.map((s) => (
+      <option key={s} value={s}>{s}</option>
+    ))}
+  </select>
+
+  {/* Date Filter */}
+  <input
+    type="date"
+    className="p-3 rounded-xl border bg-white shadow"
+    value={dateFilter}
+    onChange={(e) => setDateFilter(e.target.value)}
+      max={new Date().toISOString().split("T")[0]} // ✅ user can’t select future dates
+  />
+</div>
       {/* LIST */}
       <div className="space-y-4">
-        {filtered.map((o) => (
+        
+        {/* {filtered.map((o) => (
           <div
             key={o.id}
             className={`rounded-2xl p-4 shadow border ${cardColor(o)}`}
@@ -329,11 +353,15 @@ const update = async (id, key, value) => {
       <span className="px-3 py-1 rounded-full bg-red-600 text-md text-white">
         {o.cans} Cans
       </span>
+
+        <span className="px-3 py-1 rounded-full bg-green-300 text-md text-white">
+  {new Date(o.date).toLocaleDateString("en-GB")}
+</span>
               <Status o={o} />
               </div>
             </div>
 
-            {/* CLICKABLE PHONE WITH ICON */}
+          
             <p className="text-sm text-slate-600 mt-2 flex items-center gap-1">
               <FiPhone className="text-blue-600" />
               <a
@@ -367,7 +395,7 @@ const update = async (id, key, value) => {
                     onChange={(v) => update(o.id, "orderPayment", v)}
                   />
                    <Toaster position="top-right" />
-                  {/* {console.log('amount ')} */}
+               
                 </>
               ) : (
                 <>
@@ -375,11 +403,7 @@ const update = async (id, key, value) => {
                   <Dropdown
                     label="Today Status"
                     options={["Pending", "Delivered"]}
-                    // value={o.todayDelivered ? "Yes" : "No"}
-
-                    // onChange={(v) =>
-                    //   update(o.id, "todayDelivered", v === "Yes")
-                    // }
+                   
                       value={o.orderStatus}
                     onChange={(v) => update(o.id, "orderStatus", v)}
                   />
@@ -394,7 +418,102 @@ const update = async (id, key, value) => {
               )}
             </div>
           </div>
-        ))}
+        ))} */}
+
+
+        <div className="space-y-4">
+  {tab === "Orders" && filtered.length === 0 ? (
+     <p className="text-center text-gray-500 py-10">
+      {dateFilter === new Date().toISOString().split("T")[0]
+        ? "No daily orders for today"
+        : "No daily orders for this date"}
+    </p>
+  ) : (
+    filtered.map((o) => (
+       <div
+            key={o.id}
+            className={`rounded-2xl p-4 shadow border ${cardColor(o)}`}
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-bold">{o.name}</p>
+                <p className="text-xs text-slate-500">{o.id}</p>
+              </div>
+              
+              <div className="flex gap-3">
+
+               {console.log('o m cans-->',o)}
+      <span className="px-3 py-1 rounded-full bg-red-600 text-md text-white">
+        {o.cans} Cans
+      </span>
+
+        <span className="px-3 py-1 rounded-full bg-green-300 text-md text-white">
+  {new Date(o.date).toLocaleDateString("en-GB")}
+</span>
+              <Status o={o} />
+              </div>
+            </div>
+
+          
+            <p className="text-sm text-slate-600 mt-2 flex items-center gap-1">
+              <FiPhone className="text-blue-600" />
+              <a
+                href={`tel:${o.phone}`}
+                className="text-blue-600 hover:underline"
+              >
+                {o.phone}
+              </a>
+            </p>
+
+            <p className="text-sm text-slate-600">
+              🏠 {o.society}, {o.flat}
+            </p>
+
+            <div className="flex gap-3 mt-4">
+              {console.log('o m yha kya h-->',o)}
+              {console.log('order ka status-->',o?.type)}
+              {o.type === "daily" ? (
+                <>
+                  <Dropdown
+                    label="Order Status"
+                    options={["Pending", "Delivered"]}
+                    value={o.orderStatus}
+                    onChange={(v) => update(o.id, "orderStatus", v)}
+                  />
+                   {console.log('order ka status222-->',o)}
+                  <Dropdown
+                    label="Payment Status"
+                    options={["Pending", "Paid"]}
+                    value={o.orderPayment}
+                    onChange={(v) => update(o.id, "orderPayment", v)}
+                  />
+                   <Toaster position="top-right" />
+               
+                </>
+              ) : (
+                <>
+                {console.log('order k subscriptions m aaye?=')}
+                  <Dropdown
+                    label="Today Status"
+                    options={["Pending", "Delivered"]}
+                   
+                      value={o.orderStatus}
+                    onChange={(v) => update(o.id, "orderStatus", v)}
+                  />
+                  <Dropdown
+                    label="Payment Status"
+                    options={["Pending", "Paid"]}
+                    value={o.orderPayment}
+                    onChange={(v) => update(o.id, "orderPayment", v)}
+                  />
+                   <Toaster position="top-right" />
+                </>
+              )}
+            </div>
+          </div>
+    ))
+  )}
+</div>
       </div>
     </div>
   );

@@ -152,24 +152,77 @@ export default function UserHistory() {
   }, [selectedSociety, search]);
 
   /* ===== FILTER HISTORY ===== */
-  const filteredHistory = useMemo(() => {
-    if (!selectedUser) return [];
-    return selectedUser.history.filter((h) => {
-      if (date && h.date !== date) return false;
-      if (month && !h.date.startsWith(month)) return false;
+  // const filteredHistory = useMemo(() => {
+  //   if (!selectedUser) return [];
+  //   return selectedUser.history.filter((h) => {
+  //     if (date && h.date !== date) return false;
+  //     if (month && !h.date.startsWith(month)) return false;
+  //     return true;
+  //   });
+  // }, [selectedUser, date, month]);
+
+
+// const filteredHistory = useMemo(() => {
+//   if (!selectedUser) return [];
+
+//   return selectedUser.history.filter((h) => {
+//     const historyDate = new Date(h.date);
+
+//     // Local date string yyyy-MM-dd
+//     const year = historyDate.getFullYear();
+//     const monthNum = String(historyDate.getMonth() + 1).padStart(2, "0");
+//     const day = String(historyDate.getDate()).padStart(2, "0");
+
+//     const formattedDate = `${day}-${monthNum}-${String(year).slice(2)}`; // DD-MM-YY
+//     const localDateString = `${year}-${monthNum}-${day}`;
+
+//     // Local month string yyyy-MM
+//     const localMonthString = `${year}-${monthNum}`;
+
+//     if (date && localDateString !== date) return false;
+//     if (month && localMonthString !== month) return false;
+
+//     return true;
+//   });
+// }, [selectedUser, date, month]);
+
+
+
+const filteredHistory = useMemo(() => {
+  if (!selectedUser) return [];
+
+  return selectedUser.history
+    // 1️⃣ Filter by date/month
+    .filter((h) => {
+      const historyDate = new Date(h.date);
+
+      // Local date string yyyy-MM-dd for filtering
+      const year = historyDate.getFullYear();
+      const monthNum = String(historyDate.getMonth() + 1).padStart(2, "0");
+      const day = String(historyDate.getDate()).padStart(2, "0");
+      const localDateString = `${year}-${monthNum}-${day}`;
+      const localMonthString = `${year}-${monthNum}`;
+
+      if (date && localDateString !== date) return false;
+      if (month && localMonthString !== month) return false;
+
       return true;
+    })
+    // 2️⃣ Sort latest order first
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    // 3️⃣ Map formattedDate for display
+    .map((h) => {
+      const historyDate = new Date(h.date);
+      const year = historyDate.getFullYear();
+      const monthNum = String(historyDate.getMonth() + 1).padStart(2, "0");
+      const day = String(historyDate.getDate()).padStart(2, "0");
+
+      return {
+        ...h,
+        formattedDate: `${day}-${monthNum}-${String(year).slice(2)}`, // DD-MM-YY
+      };
     });
-  }, [selectedUser, date, month]);
-
-  /* ===== SUMMARY ===== */
-  // const summary = useMemo(() => {
-  //   const totalOrders = filteredHistory.length;
-  //   const totalCans = filteredHistory.reduce((s, h) => s + h.cans, 0);
-  //   const totalAmount = filteredHistory.reduce((s, h) => s + h.amount, 0);
-  //   return { totalOrders, totalCans, totalAmount };
-  // }, [filteredHistory]);
-
-
+}, [selectedUser, date, month]);
   const summary = useMemo(() => {
   let totalOrders = 0;
   let totalCans = 0;
@@ -350,7 +403,7 @@ export default function UserHistory() {
                 }}
                 className="pl-9 pr-3 py-2 border rounded-xl w-full text-center bg-white"
               >
-                <option value="">Select Month</option>
+                <option value="" disabled>Select Month</option>
                 <option value="2026-01">January 2026</option>
                 <option value="2026-02">February 2026</option>
                 <option value="2026-03">March 2026</option>
@@ -389,7 +442,7 @@ export default function UserHistory() {
                 {filteredHistory.map((h, i) => (
                   <tr key={i} className="border-b hover:bg-blue-50 transition">
                     <td className="px-4 py-3 font-semibold">{h.orderId}</td>
-                    <td className="text-center">{h.date}</td>
+                    <td className="text-center">{h?.formattedDate}</td>
                     <td className="text-center">{h.time}</td>
                     <td className="text-center">{h.cans}</td>
                     <td className="text-right pr-6 font-bold text-green-600">

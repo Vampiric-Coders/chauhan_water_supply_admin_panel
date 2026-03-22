@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash } from "lucide-react";
 import {
   getAllUsers,
+  updateUserCan,
   // updateUser,
   // deleteUser,
 } from "../../../apis/Users/Users";
@@ -28,14 +29,15 @@ const Users = () => {
   // ================= ADMIN ACTIONS =================
   const openPriceModal = (user) => {
     setSelectedUser(user);
-    setPrice(user.price);
+    setPrice(user?.pricePerCan);
     setShowPriceModal(true);
   };
 
   const updatePrice = async () => {
-    await updateUser(selectedUser.id, {
-      ...selectedUser,
-      price,
+    console.log('selected user--->',selectedUser?._id)
+    await updateUserCan(selectedUser._id, {
+      // ...selectedUser,
+      pricePerCan: price,
     });
     setShowPriceModal(false);
     fetchUsers();
@@ -94,7 +96,7 @@ const Users = () => {
               <div className="mt-4 space-y-1 text-sm text-gray-700">
                 <p>📞 {u?.phoneNumber}</p>
                 <p>🏠 {u?.addressFlatNo}</p>
-                <p className="font-semibold">💰 ₹{u?.price}</p>
+                <p className="font-semibold">💰 ₹{u?.pricePerCan}</p>
               </div>
  
 
